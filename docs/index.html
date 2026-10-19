@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10392c">
+  <title>Elecciones Escolares 2026 | Ricardo Palma</title>
+  <link rel="stylesheet" href="./prototype.css">
+</head>
+<body>
+  <main id="home" class="screen home-screen">
+    <header class="topbar">
+      <a class="school" href="#home"><img src="./assets/insignia.png" alt="Insignia Ricardo Palma"><span>I. E. RICARDO PALMA<small>MARCONA · PERÚ</small></span></a>
+      <button class="admin-link" data-view="admin">ADMINISTRADOR <span>↗</span></button>
+    </header>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow"><i></i> Una elección, muchas voces</p>
+        <h1>ELECCIONES<br><em>MUNICIPALES</em><br>ESCOLARES <b>2026</b></h1>
+        <p class="subtitle">La comunidad se elige. Tu voz cuenta.</p>
+        <button class="button gold" data-view="ballot">INGRESAR A VOTAR <span>→</span></button>
+        <p class="school-note">I. E. Ricardo Palma · Marcona</p>
+      </div>
+      <figure class="video-frame"><video src="./assets/presentacion.mp4" autoplay muted loop playsinline controls></video><figcaption><span>RICARDO PALMA</span><span>ELECCIONES 2026</span></figcaption></figure>
+    </section>
+    <footer class="footer"><span>PARTICIPACIÓN · RESPETO · DEMOCRACIA</span><span>MARCONA, PERÚ · 2026</span></footer>
+    <p class="prototype-tag">PROTOTIPO VISUAL · NO REGISTRA VOTOS</p>
+  </main>
+
+  <main id="ballot" class="screen ballot-screen hidden">
+    <header class="ballot-head"><img src="./assets/insignia.png" alt=""><div><p class="eyebrow">MARCONA · 2026</p><h1>Elige tu lista</h1></div><button class="icon-button" aria-label="Volver al inicio" data-view="home">←</button></header>
+    <p class="intro">Tu voz construye nuestra comunidad.</p>
+    <section class="lists">
+      <article class="list-option"><span class="list-label">LISTA 01</span><img src="./assets/opcion-1.png" alt="Logo de opción 1"><button class="button green" data-option="1">VOTAR POR ESTA LISTA <span>→</span></button></article>
+      <article class="list-option"><span class="list-label">LISTA 02</span><img src="./assets/opcion-2.png" alt="Logo de opción 2"><button class="button green" data-option="2">VOTAR POR ESTA LISTA <span>→</span></button></article>
+    </section>
+    <p class="prototype-tag">DEMO: la selección no se guarda en ninguna base de datos</p>
+  </main>
+
+  <main id="confirm" class="screen confirm-screen hidden">
+    <section class="confirm-box"><p class="eyebrow">TU SELECCIÓN</p><h1>¿ESTÁS SEGURO<br>DE TU ELECCIÓN?</h1><span id="selected-option" class="selected">OPCIÓN 01</span><p>En la aplicación final, el voto se guardará de forma segura.</p><div class="actions"><button id="confirm-button" class="button green">CONFIRMAR VOTO</button><button class="button outline" data-view="ballot">REGRESAR</button></div><small>PROTOTIPO VISUAL · NO SE REGISTRARÁ NINGÚN VOTO</small></section>
+  </main>
+
+  <main id="success" class="screen success-screen hidden"><div class="check">✓</div><p class="eyebrow">DEMOSTRACIÓN</p><h1>¡ASÍ SE VERÁ LA CONFIRMACIÓN!</h1><p>Este prototipo no guardó un voto.</p></main>
+  <main id="whiteout" class="screen whiteout hidden" aria-label="Pantalla blanca de demostración"></main>
+
+  <main id="admin" class="screen admin-screen hidden">
+    <header class="admin-head"><div class="seal">RP</div><div><p class="eyebrow">MARCONA · 2026</p><h1>PANEL ADMINISTRATIVO ELECTORAL<br><span>I. E. RICARDO PALMA</span></h1></div><button class="button outline" data-view="home">SALIR</button></header>
+    <section class="admin-content"><div class="admin-title"><div><p class="eyebrow">VISTA PREVIA</p><h2>Conteo de votos</h2></div><button class="button green" id="charts-button">▥ &nbsp; VER GRÁFICOS</button></div>
+      <p class="demo-warning">PANEL DE DEMOSTRACIÓN · Los resultados reales solo se mostrarán al conectar la base de datos y la autenticación del servidor.</p>
+      <div class="stats"><article><span>OPCIÓN 1</span><strong>—</strong><small>Sin datos conectados</small></article><article class="gold-card"><span>OPCIÓN 2</span><strong>—</strong><small>Sin datos conectados</small></article><article><span>TOTAL GENERAL</span><strong>—</strong><small>Votación no iniciada</small></article></div>
+      <section id="charts" class="charts hidden"><div><h3>Comparativo de votos</h3><div class="bar-placeholder"><i></i><i></i></div><p>Sin resultados disponibles</p></div><div><h3>Porcentaje por lista</h3><div class="pie-placeholder">—</div><p>Sin resultados disponibles</p></div></section>
+    </section><p class="prototype-tag">PROTOTIPO VISUAL · NO HAY DATOS ELECTORALES</p>
+  </main>
+  <script src="./prototype.js"></script>
+</body>
+</html>
