@@ -3,16 +3,20 @@ create extension if not exists pgcrypto;
 create table if not exists public.election_state (
   id smallint primary key check (id = 1),
   is_open boolean not null default false,
+  election_round integer not null default 1,
   updated_at timestamptz not null default now()
 );
+alter table public.election_state add column if not exists election_round integer not null default 1;
 insert into public.election_state (id, is_open) values (1, false) on conflict (id) do nothing;
 
 create table if not exists public.votes (
   id uuid primary key default gen_random_uuid(),
   operation_id uuid not null unique,
   option smallint not null check (option in (1, 2)),
+  election_round integer not null default 1,
   created_at timestamptz not null default now()
 );
+alter table public.votes add column if not exists election_round integer not null default 1;
 
 create table if not exists public.admin_login_attempts (
   client_key text primary key,
@@ -35,15 +39,16 @@ set search_path = public, pg_temp
 as $$
 declare
   existing_option smallint;
+  current_round integer;
 begin
   if p_option not in (1, 2) then raise exception 'INVALID_OPTION'; end if;
-  perform id from public.election_state where id = 1 and is_open = true for share;
+  select election_round into current_round from public.election_state where id = 1 and is_open = true for share;
   if not found then
     select option into existing_option from public.votes where operation_id = p_operation_id;
     if found and existing_option = p_option then return p_operation_id; end if;
     raise exception 'VOTING_CLOSED';
   end if;
-  insert into public.votes (operation_id, option) values (p_operation_id, p_option)
+  insert into public.votes (operation_id, option, election_round) values (p_operation_id, p_option, current_round)
   on conflict (operation_id) do nothing;
   select option into existing_option from public.votes where operation_id = p_operation_id;
   if existing_option <> p_option then raise exception 'IDEMPOTENCY_CONFLICT'; end if;
@@ -58,12 +63,18 @@ security definer
 set search_path = public, pg_temp
 as $$
   select json_build_object(
-    'option1', (select count(*) from public.votes where option = 1),
-    'option2', (select count(*) from public.votes where option = 2),
-    'total', (select count(*) from public.votes),
-    'open', (select is_open from public.election_state where id = 1),
-    'updatedAt', now()
-  );
+    'option1', (select count(*) from public.votes where election_round = state.election_round and option = 1),
+    'option2', (select count(*) from public.votes where election_round = state.election_round and option = 2),
+    'total', (select count(*) from public.votes where election_round = state.election_round),
+    'open', state.is_open,
+    'round', state.election_round,
+    'updatedAt', greatest(
+      state.updated_at,
+      coalesce((select max(created_at) from public.votes where election_round = state.election_round), state.updated_at)
+    )
+  )
+  from public.election_state as state
+  where state.id = 1;
 $$;
 
 create or replace function public.set_election_state(p_is_open boolean)
@@ -74,6 +85,23 @@ set search_path = public, pg_temp
 as $$
 begin
   update public.election_state set is_open = p_is_open, updated_at = now() where id = 1;
+end;
+$$;
+
+create or replace function public.reset_election_results()
+returns integer
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  next_round integer;
+begin
+  select election_round into next_round from public.election_state where id = 1 and is_open = false for update;
+  if not found then raise exception 'VOTING_MUST_BE_CLOSED'; end if;
+  next_round := next_round + 1;
+  update public.election_state set election_round = next_round, updated_at = now() where id = 1;
+  return next_round;
 end;
 $$;
 
@@ -124,12 +152,14 @@ $$;
 revoke all on function public.cast_vote(uuid, smallint) from public, anon, authenticated;
 revoke all on function public.get_election_results() from public, anon, authenticated;
 revoke all on function public.set_election_state(boolean) from public, anon, authenticated;
+revoke all on function public.reset_election_results() from public, anon, authenticated;
 revoke all on function public.admin_login_allowed(text) from public, anon, authenticated;
 revoke all on function public.admin_login_succeeded(text) from public, anon, authenticated;
 revoke all on function public.admin_login_failed(text) from public, anon, authenticated;
 grant execute on function public.cast_vote(uuid, smallint) to service_role;
 grant execute on function public.get_election_results() to service_role;
 grant execute on function public.set_election_state(boolean) to service_role;
+grant execute on function public.reset_election_results() to service_role;
 grant execute on function public.admin_login_allowed(text) to service_role;
 grant execute on function public.admin_login_succeeded(text) to service_role;
 grant execute on function public.admin_login_failed(text) to service_role;
