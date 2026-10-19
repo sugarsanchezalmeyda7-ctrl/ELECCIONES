@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./styles.css";
+import "./intro.css";
 
 export const metadata: Metadata = {
   title: "Elecciones Municipales Escolares 2026 | Ricardo Palma",

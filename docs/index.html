@@ -6,29 +6,13 @@
   <meta name="theme-color" content="#10392c">
   <title>Elecciones Escolares 2026 | Ricardo Palma</title>
   <link rel="stylesheet" href="./prototype.css">
+  <link rel="stylesheet" href="./intro.css">
 </head>
 <body>
-  <main id="home" class="screen home-screen">
-    <header class="topbar">
-      <a class="school" href="#home"><img src="./assets/insignia.png" alt="Insignia Ricardo Palma"><span>I. E. RICARDO PALMA<small>MARCONA · PERÚ</small></span></a>
-      <button class="admin-link" data-view="admin">ADMINISTRADOR <span>↗</span></button>
-    </header>
-    <section class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow"><i></i> Una elección, muchas voces</p>
-        <h1>ELECCIONES<br><em>MUNICIPALES</em><br>ESCOLARES <b>2026</b></h1>
-        <p class="subtitle">La comunidad se elige. Tu voz cuenta.</p>
-        <button class="button gold" data-view="ballot">INGRESAR A VOTAR <span>→</span></button>
-        <p class="school-note">I. E. Ricardo Palma · Marcona</p>
-      </div>
-      <figure class="video-frame"><video src="./assets/presentacion.mp4" autoplay muted loop playsinline controls></video><figcaption><span>RICARDO PALMA</span><span>ELECCIONES 2026</span></figcaption></figure>
-    </section>
-    <footer class="footer"><span>PARTICIPACIÓN · RESPETO · DEMOCRACIA</span><span>MARCONA, PERÚ · 2026</span></footer>
-    <p class="prototype-tag">PROTOTIPO VISUAL · NO REGISTRA VOTOS</p>
-  </main>
+  <main id="home" class="screen home-screen intro-screen"><video id="welcome-video" src="./assets/presentacion.mp4" muted playsinline aria-label="Video institucional de bienvenida"></video></main>
 
   <main id="ballot" class="screen ballot-screen hidden">
-    <header class="ballot-head"><img src="./assets/insignia.png" alt=""><div><p class="eyebrow">MARCONA · 2026</p><h1>Elige tu lista</h1></div><button class="icon-button" aria-label="Volver al inicio" data-view="home">←</button></header>
+    <header class="ballot-head"><img src="./assets/insignia.png" alt=""><div><p class="eyebrow">MARCONA · 2026</p><h1>Elige tu lista</h1></div><button class="admin-link ballot-admin-link" data-view="admin">ADMINISTRADOR</button></header>
     <p class="intro">Tu voz construye nuestra comunidad.</p>
     <section class="lists">
       <article class="list-option"><span class="list-label">LISTA 01</span><img src="./assets/opcion-1.png" alt="Logo de opción 1"><button class="button green" data-option="1">VOTAR POR ESTA LISTA <span>→</span></button></article>

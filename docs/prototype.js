@@ -4,6 +4,16 @@ function show(id) {
   screens.forEach((screen) => screen.classList.toggle('hidden', screen.id !== id));
   window.scrollTo(0, 0);
 }
+const introKey = 'rp_election_intro_completed_2026';
+function finishIntro() {
+  localStorage.setItem(introKey, 'yes');
+  show('ballot');
+}
+const welcomeVideo = document.querySelector('#welcome-video');
+welcomeVideo.addEventListener('ended', finishIntro, { once: true });
+welcomeVideo.addEventListener('error', finishIntro, { once: true });
+if (localStorage.getItem(introKey) === 'yes') show('ballot');
+else welcomeVideo.play().catch(finishIntro);
 document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', () => show(button.dataset.view)));
 document.querySelectorAll('[data-option]').forEach((button) => button.addEventListener('click', () => {
   selected = Number(button.dataset.option);
@@ -14,7 +24,7 @@ document.querySelector('#confirm-button').addEventListener('click', () => {
   show('success');
   window.setTimeout(() => {
     show('whiteout');
-    window.setTimeout(() => show('home'), 10_000);
+    window.setTimeout(() => show('ballot'), 10_000);
   }, 1_500);
 });
 document.querySelector('#charts-button').addEventListener('click', (event) => {

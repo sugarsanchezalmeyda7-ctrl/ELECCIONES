@@ -1,17 +1,40 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-type Screen = "home" | "choices" | "confirm" | "success" | "white" | "login";
+type Screen = "intro" | "choices" | "confirm" | "success" | "white" | "login";
+const INTRO_KEY = "rp_election_intro_completed_2026";
 
 export default function Home() {
-  const [screen, setScreen] = useState<Screen>("home");
+  const [screen, setScreen] = useState<Screen>("intro");
   const [option, setOption] = useState<1 | 2>(1);
   const [operationId, setOperationId] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [password, setPassword] = useState("");
+  const introVideo = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(INTRO_KEY) === "yes") {
+        setScreen("choices");
+        return;
+      }
+    } catch {
+      // Continue with the presentation when browser storage is unavailable.
+    }
+    void introVideo.current?.play().catch(finishIntro);
+  }, []);
+
+  function finishIntro() {
+    try {
+      window.localStorage.setItem(INTRO_KEY, "yes");
+    } catch {
+      // The current tab still proceeds if browser storage is unavailable.
+    }
+    setScreen("choices");
+  }
 
   function choose(value: 1 | 2) {
     setOption(value);
@@ -38,7 +61,7 @@ export default function Home() {
         window.setTimeout(() => {
           setMessage("");
           setOperationId("");
-          setScreen("home");
+          setScreen("choices");
         }, 10_000);
       }, 1600);
     } catch (error) {
@@ -81,7 +104,7 @@ export default function Home() {
           {message && <p className="form-error" role="alert">{message}</p>}
           <button className="button button-primary" disabled={busy}>{busy ? "VALIDANDO..." : "INGRESAR"}</button>
         </form>
-        <button className="text-button" onClick={() => { setMessage(""); setScreen("home"); }}>Volver al inicio</button>
+        <button className="text-button" onClick={() => { setMessage(""); setScreen("choices"); }}>Volver a votar</button>
       </section>
     </main>;
   }
@@ -91,6 +114,7 @@ export default function Home() {
       <header className="ballot-header">
         <Image src="/images/insignia-ricardo-palma.png" alt="Insignia Ricardo Palma" width={54} height={68} />
         <div><p className="eyebrow">Marcona · 2026</p><h1>Elige tu lista</h1></div>
+        {screen === "choices" && <button className="admin-link ballot-admin-link" onClick={() => { setMessage(""); setScreen("login"); }}>ADMINISTRADOR</button>}
       </header>
       {screen === "choices" ? <>
         <p className="ballot-intro">Tu voz construye nuestra comunidad.</p>
@@ -112,32 +136,10 @@ export default function Home() {
           <button className="button button-outline" disabled={busy} onClick={() => { setOperationId(""); setMessage(""); setScreen("choices"); }}>REGRESAR</button>
         </div>
       </section>}
-      {screen === "choices" && <button className="text-button ballot-back" onClick={() => setScreen("home")}>Volver al inicio</button>}
     </main>;
   }
 
   if (screen === "success") return <main className="success-page"><div className="success-mark" aria-hidden="true">✓</div><p className="eyebrow">Elecciones escolares 2026</p><h1>¡TU VOTO HA SIDO REGISTRADO CORRECTAMENTE!</h1></main>;
 
-  return <main className="home-page">
-    <div className="home-shape home-shape-one" />
-    <div className="home-shape home-shape-two" />
-    <header className="home-topbar">
-      <div className="school-lockup"><Image src="/images/insignia-ricardo-palma.png" alt="Insignia oficial de la Institución Educativa Ricardo Palma" width={50} height={64} /><span>I. E. RICARDO PALMA<br /><small>MARCONA · PERÚ</small></span></div>
-      <button className="admin-link" onClick={() => { setMessage(""); setScreen("login"); }}>ADMINISTRADOR <span aria-hidden="true">↗</span></button>
-    </header>
-    <section className="hero-content">
-      <div className="hero-copy">
-        <p className="eyebrow"><span className="live-dot" /> Una elección, muchas voces</p>
-        <h1>ELECCIONES<br /><em>MUNICIPALES</em><br />ESCOLARES <span>2026</span></h1>
-        <p className="hero-subtitle">La comunidad se elige. Tu voz cuenta.</p>
-        <button className="button button-gold hero-button" onClick={() => setScreen("choices")}>INGRESAR A VOTAR <span aria-hidden="true">→</span></button>
-        <p className="hero-note">I. E. Ricardo Palma · Marcona</p>
-      </div>
-      <div className="hero-media">
-        <video src="/videos/presentacion.mp4" autoPlay muted loop playsInline controls aria-label="Video institucional de bienvenida" />
-        <div className="media-caption"><span>RICARDO PALMA</span><span>ELECCIONES 2026</span></div>
-      </div>
-    </section>
-    <footer className="home-footer"><span>PARTICIPACIÓN · RESPETO · DEMOCRACIA</span><span>MARCONA, PERÚ <b>●</b> 2026</span></footer>
-  </main>;
+  return <main className="intro-screen"><video ref={introVideo} src="/videos/presentacion.mp4" muted playsInline onEnded={finishIntro} onError={finishIntro} aria-label="Video institucional de bienvenida" /></main>;
 }
