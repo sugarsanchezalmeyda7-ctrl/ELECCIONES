@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 type Screen = "intro" | "choices" | "confirm" | "success" | "white" | "login";
-const INTRO_KEY = "rp_election_intro_completed_2026";
 
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("intro");
@@ -14,26 +13,23 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [password, setPassword] = useState("");
   const introVideo = useRef<HTMLVideoElement>(null);
+  const introFinished = useRef(false);
 
   useEffect(() => {
-    try {
-      if (window.localStorage.getItem(INTRO_KEY) === "yes") {
-        setScreen("choices");
-        return;
-      }
-    } catch {
-      // Continue with the presentation when browser storage is unavailable.
-    }
-    void introVideo.current?.play().catch(finishIntro);
-  }, []);
+    if (screen !== "intro") return;
+    const video = introVideo.current;
+    if (!video) return;
+    introFinished.current = false;
+    video.classList.remove("fade-out");
+    video.currentTime = 0;
+    void video.play().catch(() => setScreen((current) => current === "intro" ? "choices" : current));
+  }, [screen]);
 
   function finishIntro() {
-    try {
-      window.localStorage.setItem(INTRO_KEY, "yes");
-    } catch {
-      // The current tab still proceeds if browser storage is unavailable.
-    }
-    setScreen("choices");
+    if (introFinished.current) return;
+    introFinished.current = true;
+    introVideo.current?.classList.add("fade-out");
+    window.setTimeout(() => setScreen((current) => current === "intro" ? "choices" : current), 500);
   }
 
   function choose(value: 1 | 2) {
@@ -61,7 +57,7 @@ export default function Home() {
         window.setTimeout(() => {
           setMessage("");
           setOperationId("");
-          setScreen("choices");
+          setScreen("intro");
         }, 10_000);
       }, 1600);
     } catch (error) {

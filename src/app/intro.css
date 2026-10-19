@@ -1,4 +1,5 @@
 .intro-screen{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;overflow:hidden;background:#000}
-.intro-screen video{display:block;width:100%;height:100%;object-fit:cover}
+.intro-screen video{display:block;width:100%;height:100%;object-fit:cover;opacity:1;transition:opacity .5s ease}
+.intro-screen video.fade-out{opacity:0}
 .ballot-header .ballot-admin-link{margin-left:auto;color:var(--forest);font-size:10px}
 .ballot-header .ballot-admin-link:hover{color:var(--green)}
